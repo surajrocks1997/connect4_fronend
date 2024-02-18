@@ -1,4 +1,5 @@
 import axios from "axios";
+
 import { GENERATE_KEY } from "./types";
 
 export const generateKey = () => async (dispatch) => {
