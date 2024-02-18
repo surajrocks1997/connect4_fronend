@@ -2,8 +2,13 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { connect } from "react-redux";
 import { setUserName } from "../Actions/userData";
+import { generateKey } from "../Actions/gameData";
 
-const WelcomePage = ({ setUserName }) => {
+const WelcomePage = ({
+    setUserName,
+    generateKey,
+    gameData: { loading, gameKey },
+}) => {
     const [name, setName] = useState("");
 
     const updateName = (e) => {
@@ -28,16 +33,34 @@ const WelcomePage = ({ setUserName }) => {
                     onClick={() => setUserName(name)}
                 ></input>
             </div>
+            <br />
+            <hr />
+            <div className="GameRoom">
+                <input
+                    type="button"
+                    value="Create Room"
+                    onClick={() => generateKey()}
+                ></input>
+                <input type="button" value="Join Room"></input>
+            </div>
+            <br />
+            {loading ? "" : <div>Your GAME KEY is : {gameKey}</div>}
         </div>
     );
 };
 
 WelcomePage.propTypes = {
     setUserName: PropTypes.func.isRequired,
+    generateKey: PropTypes.func.isRequired,
+    loading: PropTypes.bool,
+    gameKey: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
-    userData: state.userReducer,
+    userInfo: state.userInfo,
+    gameData: state.gameData,
 });
 
-export default connect(mapStateToProps, { setUserName })(WelcomePage);
+export default connect(mapStateToProps, { setUserName, generateKey })(
+    WelcomePage
+);
