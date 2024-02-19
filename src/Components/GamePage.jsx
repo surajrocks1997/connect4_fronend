@@ -6,13 +6,13 @@ import { useNavigate } from "react-router-dom";
 const GamePage = ({
     generateKey,
     userInfo: { username },
-    gameData: { loading, gameKey },
+    gameData: { gameKey },
 }) => {
     const navigate = useNavigate();
 
-    const createRoom = () => {
-        generateKey();
-        navigate("/wait");
+    const createRoom = async () => {
+        await generateKey();
+        navigate(`/game/wait/${gameKey}`);
     };
 
     return (
@@ -30,20 +30,12 @@ const GamePage = ({
                 <input type="button" value="Join Room"></input>
             </div>
             <br />
-            {loading ? (
-                ""
-            ) : (
-                <div>
-                    Your GAME KEY is : {gameKey} <br />{" "}
-                </div>
-            )}
-            {loading ? "" : <div></div>}
         </div>
     );
 };
 
 GamePage.propTypes = {
-    username: PropTypes.string.isRequired,
+    username: PropTypes.string,
     generateKey: PropTypes.func.isRequired,
     loading: PropTypes.bool,
     gameKey: PropTypes.string,

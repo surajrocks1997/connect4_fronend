@@ -12,7 +12,7 @@ const App = () => {
                 <Routes>
                     <Route Component={WelcomePage} path="/"></Route>
                     <Route Component={GamePage} path="/game"></Route>
-                    <Route Component={WaitingRoom} path="/wait"></Route>
+                    <Route Component={WaitingRoom} path="/game/wait/:gameKey"></Route>
                 </Routes>
             </Router>
         </div>

@@ -6,8 +6,9 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 const WaitingRoom = ({
-    userInfo: { username },
+    props,
     gameData: { loading, gameKey },
+    userInfo: { username },
 }) => {
     const dispatch = useDispatch();
 
@@ -15,44 +16,59 @@ const WaitingRoom = ({
         const socket = new SockJS("http://localhost:8080/ws-connect4");
         const stompClient = Stomp̥.over(socket);
 
-        stompClient.connect(
-            {},
-            (frame) => {
-                console.log("Connected: " + frame);
-                stompClient.subscribe(
-                    "/topic/" + gameKey + "/key",
-                    (message) => {
-                        console.log(message);
-                    }
+        const onConnected = (frame) => {
+            console.log(frame);
+
+            const onMessageRecieved = (message) => {
+                console.log(message);
+
+                stompClient.send(
+                    `/app/game.addUser/${props.gameKey}`,
+                    {},
+                    JSON.stringify({ sender: username, type: "JOIN" })
                 );
-            },
-            (error) => {
-                console.log(error);
-                console.log(
-                    "Could not connect to WebSocket server. Please refresh this page to try again!"
-                );
-            }
-        );
-    }, [dispatch]);
+            };
+
+            stompClient.subscribe(
+                "/topic/" + gameKey + "/key",
+                onMessageRecieved
+            );
+        };
+        const onError = (error) => {
+            console.log(error);
+            console.log(
+                "Could not connect to WebSocket server. Please refresh this page to try again!"
+            );
+        };
+
+        stompClient.connect({}, onConnected, onError);
+    }, [dispatch, gameKey]);
 
     return (
         <div>
             <div className="title">Waiting Room</div>
             <br />
             <hr />
+            {loading ? (
+                ""
+            ) : (
+                <div>
+                    Your GAME KEY is : {gameKey} <br />{" "}
+                </div>
+            )}
         </div>
     );
 };
 
 WaitingRoom.propTypes = {
-    username: PropTypes.string.isRequired,
+    username: PropTypes.string,
     loading: PropTypes.bool,
     gameKey: PropTypes.string,
 };
 
 const mapStateToProps = (state) => ({
-    userInfo: state.userInfo,
     gameData: state.gameData,
+    userInfo: state.userInfo,
 });
 
 export default connect(mapStateToProps, {})(WaitingRoom);

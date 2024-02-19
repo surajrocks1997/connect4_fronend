@@ -11,7 +11,7 @@ const gameData = (state = initState, action) => {
         case GENERATE_KEY:
             return {
                 ...state,
-                gameKey: payload.data,
+                gameKey: payload,
                 loading: false,
             };
 
