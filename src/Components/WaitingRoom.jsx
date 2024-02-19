@@ -20,18 +20,19 @@ const WaitingRoom = ({
             console.log(frame);
 
             const onMessageRecieved = (message) => {
+                console.log("FROM ON MESSAGE RECIEVED");
                 console.log(message);
-
-                stompClient.send(
-                    `/app/game.addUser/${props.gameKey}`,
-                    {},
-                    JSON.stringify({ sender: username, type: "JOIN" })
-                );
             };
 
             stompClient.subscribe(
                 "/topic/" + gameKey + "/key",
                 onMessageRecieved
+            );
+
+            stompClient.send(
+                `/app/game.addUser/${gameKey}`,
+                {},
+                JSON.stringify({ username, type: "JOIN" })
             );
         };
         const onError = (error) => {
@@ -42,7 +43,7 @@ const WaitingRoom = ({
         };
 
         stompClient.connect({}, onConnected, onError);
-    }, [dispatch, gameKey]);
+    }, [dispatch, gameKey, username]);
 
     return (
         <div>
