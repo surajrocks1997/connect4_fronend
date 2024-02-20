@@ -43,6 +43,10 @@ const WaitingRoom = ({
         };
 
         stompClient.connect({}, onConnected, onError);
+
+        return () => {
+            stompClient.disconnect();
+        }
     }, [dispatch, gameKey, username]);
 
     return (
