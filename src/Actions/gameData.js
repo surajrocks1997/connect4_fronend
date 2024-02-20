@@ -10,4 +10,5 @@ export const generateKey = () => async (dispatch) => {
         type: GENERATE_KEY,
         payload: gameKey.data,
     });
+    return gameKey.data;
 };

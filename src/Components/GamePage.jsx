@@ -3,16 +3,12 @@ import PropTypes from "prop-types";
 import { generateKey } from "../Actions/gameData";
 import { useNavigate } from "react-router-dom";
 
-const GamePage = ({
-    generateKey,
-    userInfo: { username },
-    gameData: { gameKey },
-}) => {
+const GamePage = ({ generateKey, userInfo: { username } }) => {
     const navigate = useNavigate();
 
     const createRoom = async () => {
-        await generateKey();
-        navigate(`/game/wait/${gameKey}`);
+        const generatedKey = await generateKey();
+        navigate(`/game/${generatedKey}`);
     };
 
     return (
@@ -43,7 +39,6 @@ GamePage.propTypes = {
 
 const mapStateToProps = (state) => ({
     userInfo: state.userInfo,
-    gameData: state.gameData,
 });
 
 export default connect(mapStateToProps, { generateKey })(GamePage);
