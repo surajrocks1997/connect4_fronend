@@ -13,6 +13,7 @@ const GamePage = ({
     joinRoomValidation,
     setGameKeyInState,
     userInfo: { username },
+    gameData: { error },
 }) => {
     const [joinBox, setJoinBox] = useState(false);
     const [roomkey, setRoomKey] = useState("");
@@ -23,11 +24,12 @@ const GamePage = ({
         navigate(`/game/${generatedKey}`);
     };
 
-    const joinRoom = () => {
-        joinRoomValidation(roomkey);
-
-        // setGameKeyInState(roomkey);
-        // navigate(`/game/${roomkey}`);
+    const joinRoom = async () => {
+        const res = await joinRoomValidation(roomkey);
+        if (res.status === 200) {
+            setGameKeyInState(roomkey);
+            navigate(`/game/${roomkey}`);
+        }
     };
 
     return (
@@ -70,6 +72,8 @@ const GamePage = ({
             ) : (
                 ""
             )}
+            <br />
+            {error !== "" ? <div>{error}</div> : ""}
         </div>
     );
 };
@@ -83,6 +87,7 @@ GamePage.propTypes = {
 
 const mapStateToProps = (state) => ({
     userInfo: state.userInfo,
+    gameData: state.gameData,
 });
 
 export default connect(mapStateToProps, {
