@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 
 const WaitingRoom = ({
     props,
-    gameData: { loading, gameKey, joinStatus },
+    gameData: { loading, gameKey, joinStatus, leaveStatus },
     userInfo: { username },
 }) => {
     const dispatch = useDispatch();
@@ -78,6 +78,8 @@ const WaitingRoom = ({
             )}
             {joinStatus.length > 0 &&
                 joinStatus.map((ele) => <p>{ele} Joined</p>)}
+            {leaveStatus.length > 0 &&
+                leaveStatus.map((ele) => <p>{ele} Left!</p>)}
         </div>
     );
 };
@@ -86,6 +88,8 @@ WaitingRoom.propTypes = {
     username: PropTypes.string,
     loading: PropTypes.bool,
     gameKey: PropTypes.string,
+    joinStatus: PropTypes.array.isRequired,
+    leaveStatus: PropTypes.array.isRequired,
 };
 
 const mapStateToProps = (state) => ({
