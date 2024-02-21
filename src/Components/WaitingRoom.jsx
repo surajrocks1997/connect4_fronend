@@ -49,11 +49,11 @@ const WaitingRoom = ({
         stompClient.connect({}, onConnected, onError);
 
         return () => {
-            stompClient.send(
-                `/app/game.removeUser/${gameKey}`,
-                {},
-                JSON.stringify({ username, type: "LEAVE" })
-            );
+            // stompClient.send(
+            //     `/app/game.removeUser/${gameKey}`,
+            //     {},
+            //     JSON.stringify({ username, type: "LEAVE" })
+            // );
 
             stompClient.disconnect(
                 {},

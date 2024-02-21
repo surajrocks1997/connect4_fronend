@@ -35,7 +35,7 @@ export const joinRoomValidation = (roomkey) => async (dispatch) => {
                 type: CLEAR_JOIN_ERROR,
                 payload: "",
             });
-        }, 5000);
+        }, 10000);
         return 500;
     }
 };
