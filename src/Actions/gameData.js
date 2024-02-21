@@ -13,9 +13,21 @@ export const generateKey = () => async (dispatch) => {
     return gameKey.data;
 };
 
+export const joinRoomValidation = (roomkey) => async () => {
+    const url = `http://localhost:8080/isJoinRoomAvailable/${roomkey}`;
+    try {
+        const res = await axios.get(url);
+        console.log(res.data);
+    } catch (error) {
+        console.log(error);
+    }
+
+    
+};
+
 export const setGameKeyInState = (roomKey) => (dispatch) => {
     dispatch({
         type: JOIN_ROOM,
         payload: roomKey,
     });
-} 
+};

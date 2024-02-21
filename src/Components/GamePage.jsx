@@ -1,11 +1,16 @@
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { generateKey, setGameKeyInState } from "../Actions/gameData";
+import {
+    generateKey,
+    setGameKeyInState,
+    joinRoomValidation,
+} from "../Actions/gameData";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const GamePage = ({
     generateKey,
+    joinRoomValidation,
     setGameKeyInState,
     userInfo: { username },
 }) => {
@@ -19,8 +24,10 @@ const GamePage = ({
     };
 
     const joinRoom = () => {
-        setGameKeyInState(roomkey);
-        navigate(`/game/${roomkey}`);
+        joinRoomValidation(roomkey);
+
+        // setGameKeyInState(roomkey);
+        // navigate(`/game/${roomkey}`);
     };
 
     return (
@@ -71,12 +78,15 @@ GamePage.propTypes = {
     username: PropTypes.string,
     generateKey: PropTypes.func.isRequired,
     setGameKeyInState: PropTypes.func.isRequired,
+    joinRoomValidation: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
     userInfo: state.userInfo,
 });
 
-export default connect(mapStateToProps, { generateKey, setGameKeyInState })(
-    GamePage
-);
+export default connect(mapStateToProps, {
+    generateKey,
+    setGameKeyInState,
+    joinRoomValidation,
+})(GamePage);
