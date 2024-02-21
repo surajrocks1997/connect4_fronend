@@ -9,6 +9,7 @@ const initState = {
     gameKey: null,
     loading: true,
     error: "",
+    joinStatus: [],
 };
 
 const gameData = (state = initState, action) => {
@@ -38,6 +39,11 @@ const gameData = (state = initState, action) => {
                 ...state,
                 error: "",
                 loading: true,
+            };
+        case "JOIN":
+            return {
+                ...state,
+                joinStatus: [...state.joinStatus, payload],
             };
 
         default:

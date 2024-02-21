@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 
 const WaitingRoom = ({
     props,
-    gameData: { loading, gameKey },
+    gameData: { loading, gameKey, joinStatus },
     userInfo: { username },
 }) => {
     const dispatch = useDispatch();
@@ -19,9 +19,13 @@ const WaitingRoom = ({
         const onConnected = (frame) => {
             console.log(frame);
 
-            const onMessageRecieved = (message) => {
+            const onMessageRecieved = (payload) => {
                 console.log("FROM ON MESSAGE RECIEVED");
-                console.log(message);
+                var message = JSON.parse(payload.body);
+                dispatch({
+                    type: message.type,
+                    payload: message.username,
+                });
             };
 
             stompClient.subscribe(
@@ -51,9 +55,12 @@ const WaitingRoom = ({
                 JSON.stringify({ username, type: "LEAVE" })
             );
 
-            stompClient.disconnect({}, {
-                gameKey
-            });
+            stompClient.disconnect(
+                {},
+                {
+                    gameKey,
+                }
+            );
         };
     }, [dispatch, gameKey, username]);
 
@@ -69,6 +76,8 @@ const WaitingRoom = ({
                     Your GAME KEY is : {gameKey} <br />{" "}
                 </div>
             )}
+            {joinStatus.length > 0 &&
+                joinStatus.map((ele) => <p>{ele} Joined</p>)}
         </div>
     );
 };
