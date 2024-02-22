@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 
 const WaitingRoom = ({
     props,
-    gameData: { loading, gameKey, joinStatus, leaveStatus },
+    gameData: { loading, gameKey, joinStatus },
     userInfo: { username },
 }) => {
     const dispatch = useDispatch();
@@ -24,7 +24,9 @@ const WaitingRoom = ({
                 var message = JSON.parse(payload.body);
                 dispatch({
                     type: message.type,
-                    payload: message.username,
+                    payload:
+                        message.username +
+                        (message.type === "JOIN" ? " joined" : " left!!"),
                 });
             };
 
@@ -76,10 +78,7 @@ const WaitingRoom = ({
                     Your GAME KEY is : {gameKey} <br />{" "}
                 </div>
             )}
-            {joinStatus.length > 0 &&
-                joinStatus.map((ele) => <p>{ele} Joined</p>)}
-            {leaveStatus.length > 0 &&
-                leaveStatus.map((ele) => <p>{ele} Left!</p>)}
+            {joinStatus.length > 0 && joinStatus.map((ele) => <p>{ele}</p>)}
         </div>
     );
 };
@@ -89,7 +88,6 @@ WaitingRoom.propTypes = {
     loading: PropTypes.bool,
     gameKey: PropTypes.string,
     joinStatus: PropTypes.array.isRequired,
-    leaveStatus: PropTypes.array.isRequired,
 };
 
 const mapStateToProps = (state) => ({

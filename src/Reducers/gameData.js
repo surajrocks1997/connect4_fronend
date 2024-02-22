@@ -10,7 +10,6 @@ const initState = {
     loading: true,
     error: "",
     joinStatus: [],
-    leaveStatus: [],
 };
 
 const gameData = (state = initState, action) => {
@@ -42,17 +41,11 @@ const gameData = (state = initState, action) => {
                 loading: true,
             };
         case "JOIN":
+        case "LEAVE":
             return {
                 ...state,
                 joinStatus: [...state.joinStatus, payload],
             };
-        case "LEAVE":
-            return {
-                ...state,
-                joinStatus: state.joinStatus.filter((item) => item !== payload),
-                leaveStatus: [...state.leaveStatus, payload],
-            };
-
         default:
             return state;
     }
