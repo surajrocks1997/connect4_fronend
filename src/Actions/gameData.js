@@ -7,6 +7,7 @@ import {
     CLEAR_JOIN_ERROR,
     IS_ADMIN,
     CLEAR_GAME_JOIN_STATUS,
+    MOVE_IDENTIFIER,
 } from "./types";
 
 export const generateKey = () => async (dispatch) => {
@@ -21,6 +22,11 @@ export const generateKey = () => async (dispatch) => {
         type: IS_ADMIN,
         payload: true,
     });
+    dispatch({
+        type: MOVE_IDENTIFIER,
+        payload: 1,
+    });
+
     return gameKey.data;
 };
 
@@ -51,6 +57,10 @@ export const setGameKeyInState = (roomKey) => (dispatch) => {
         type: JOIN_ROOM,
         payload: roomKey,
     });
+    dispatch({
+        type: MOVE_IDENTIFIER,
+        payload: 2,
+    });
 };
 
 export const disconnect = () => (dispatch) => {
@@ -66,4 +76,11 @@ export const disconnect = () => (dispatch) => {
         type: CLEAR_GAME_JOIN_STATUS,
         payload: null,
     });
+};
+
+export const getBoard = () => async (dispatch) => {
+    console.log("INSIDE INIT BOARD");
+    const url = "http://localhost:8080/boardState";
+    const board = await axios.get(url);
+    console.log(board.data);
 };

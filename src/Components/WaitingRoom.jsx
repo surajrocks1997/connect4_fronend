@@ -4,7 +4,7 @@ import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { disconnect } from "../Actions/gameData";
+import { disconnect, getBoard } from "../Actions/gameData";
 import { useNavigate } from "react-router-dom";
 
 import Board from "./Board";
@@ -18,6 +18,7 @@ const WaitingRoom = ({
     },
     userInfo: { username, isAdmin },
     disconnect,
+    getBoard,
 }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -81,7 +82,8 @@ const WaitingRoom = ({
         };
     }, [dispatch, navigate, disconnect, gameKey, username]);
 
-    const startGame = () => {
+    const startGame = async () => {
+        await getBoard();
         stompClient.send(
             `/app/game.startGame/${gameKey}`,
             {},
@@ -90,7 +92,7 @@ const WaitingRoom = ({
     };
 
     return gameStarted ? (
-        <Board />
+        <Board stompClient={stompClient} />
     ) : (
         <div>
             <div className="title">Waiting Room</div>
@@ -139,6 +141,7 @@ WaitingRoom.propTypes = {
     disconnect: PropTypes.func.isRequired,
     players: PropTypes.number,
     gameStarted: PropTypes.bool,
+    getBoard: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -146,4 +149,4 @@ const mapStateToProps = (state) => ({
     userInfo: state.userInfo,
 });
 
-export default connect(mapStateToProps, { disconnect })(WaitingRoom);
+export default connect(mapStateToProps, { disconnect, getBoard })(WaitingRoom);

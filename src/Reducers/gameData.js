@@ -18,6 +18,11 @@ const initState = {
         players: 0,
         gameStarted: false,
     },
+    gameSettings: {
+        rows: 6,
+        cols: 7,
+    },
+    board: [],
 };
 
 const gameData = (state = initState, action) => {

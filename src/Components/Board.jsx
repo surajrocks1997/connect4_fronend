@@ -1,11 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
 
-const Board = () => {
-    const rows = 6;
-    const cols = 7;
-    
+const Board = ({
+    stompClient,
+    userInfo: { moveIdentifier },
+    gameData: {
+        board,
+        gameSettings: { rows, cols },
+    },
+}) => {
     // Initialize the grid state
-    const [grid, setGrid] = useState(Array(rows).fill(Array(cols).fill("/greenDot.png")));
+    const [grid, setGrid] = useState(
+        Array(rows).fill(Array(cols).fill("/greenDot.png"))
+    );
 
     // Function to handle cell click
     const handleCellClick = (rowIndex, colIndex) => {
@@ -39,4 +47,17 @@ const Board = () => {
     );
 };
 
-export default Board;
+Board.propTypes = {
+    moveIdentifier: PropTypes.number,
+    board: PropTypes.array,
+    rows: PropTypes.number,
+    cols: PropTypes.number,
+    stompClient: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+    gameData: state.gameData,
+    userInfo: state.userInfo,
+});
+
+export default connect(mapStateToProps, {})(Board);
