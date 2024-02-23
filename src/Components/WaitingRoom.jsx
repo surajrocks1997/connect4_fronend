@@ -7,6 +7,8 @@ import { useDispatch } from "react-redux";
 import { disconnect } from "../Actions/gameData";
 import { useNavigate } from "react-router-dom";
 
+import Board from "./Board";
+
 const WaitingRoom = ({
     props,
     gameData: {
@@ -88,7 +90,7 @@ const WaitingRoom = ({
     };
 
     return gameStarted ? (
-        <div>"BOARD GOES HERE"</div>
+        <Board />
     ) : (
         <div>
             <div className="title">Waiting Room</div>
