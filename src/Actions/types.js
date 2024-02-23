@@ -6,4 +6,5 @@ export const USER_INFO = "USER_INFO";
 export const IS_ADMIN = "IS_ADMIN";
 export const JOIN = "JOIN"
 export const LEAVE = "LEAVE"
+export const START = "START"
 export const CLEAR_GAME_JOIN_STATUS = "CLEAR_GAME_JOIN_STATUS"

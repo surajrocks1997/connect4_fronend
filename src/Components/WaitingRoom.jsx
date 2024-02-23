@@ -12,7 +12,7 @@ const WaitingRoom = ({
     gameData: {
         loading,
         gameKey,
-        gameStatus: { joinStatus, players },
+        gameStatus: { joinStatus, players, gameStarted },
     },
     userInfo: { username, isAdmin },
     disconnect,
@@ -20,11 +20,11 @@ const WaitingRoom = ({
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const socket = new SockJS("http://localhost:8080/ws-connect4");
+    const stompClient = Stomp.over(socket);
+
     useEffect(() => {
         if (gameKey == null) return navigate("/game");
-
-        const socket = new SockJS("http://localhost:8080/ws-connect4");
-        const stompClient = Stomp.over(socket);
 
         const onConnected = (frame) => {
             console.log(frame);
@@ -32,12 +32,19 @@ const WaitingRoom = ({
             const onMessageRecieved = (payload) => {
                 console.log("FROM ON MESSAGE RECIEVED");
                 var message = JSON.parse(payload.body);
-                dispatch({
-                    type: message.type,
-                    payload:
-                        message.username +
-                        (message.type === "JOIN" ? " joined" : " left!!"),
-                });
+                if (message.type === "JOIN" || message.type === "LEAVE") {
+                    dispatch({
+                        type: message.type,
+                        payload:
+                            message.username +
+                            (message.type === "JOIN" ? " joined" : " left!!"),
+                    });
+                } else {
+                    dispatch({
+                        type: message.type,
+                        payload: true,
+                    });
+                }
             };
 
             stompClient.subscribe(
@@ -61,13 +68,6 @@ const WaitingRoom = ({
         stompClient.connect({}, onConnected, onError);
 
         return () => {
-            // stompClient.send(
-            //     `/app/game.removeUser/${gameKey}`,
-            //     {},
-            //     JSON.stringify({ username, type: "LEAVE" })
-            // );
-
-            // TODO
             disconnect();
 
             stompClient.disconnect(
@@ -79,7 +79,17 @@ const WaitingRoom = ({
         };
     }, [dispatch, navigate, disconnect, gameKey, username]);
 
-    return (
+    const startGame = () => {
+        stompClient.send(
+            `/app/game.startGame/${gameKey}`,
+            {},
+            JSON.stringify({ username, type: "START" })
+        );
+    };
+
+    return gameStarted ? (
+        <div>"BOARD GOES HERE"</div>
+    ) : (
         <div>
             <div className="title">Waiting Room</div>
             <br />
@@ -99,7 +109,11 @@ const WaitingRoom = ({
             {isAdmin ? (
                 players > 1 ? (
                     <div className="btn join-game-button">
-                        <input type="button" value="START GAME" />
+                        <input
+                            type="button"
+                            value="START GAME"
+                            onClick={startGame}
+                        />
                     </div>
                 ) : (
                     <p>
@@ -122,6 +136,7 @@ WaitingRoom.propTypes = {
     isAdmin: PropTypes.bool,
     disconnect: PropTypes.func.isRequired,
     players: PropTypes.number,
+    gameStarted: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({

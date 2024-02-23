@@ -6,6 +6,7 @@ import {
     JOIN,
     LEAVE,
     CLEAR_GAME_JOIN_STATUS,
+    START,
 } from "../Actions/types";
 
 const initState = {
@@ -15,7 +16,7 @@ const initState = {
     gameStatus: {
         joinStatus: [],
         players: 0,
-        gameStarted: false
+        gameStarted: false,
     },
 };
 
@@ -63,6 +64,14 @@ const gameData = (state = initState, action) => {
                     ...state.gameStatus,
                     players: state.gameStatus.players - 1,
                     joinStatus: [...state.gameStatus.joinStatus, payload],
+                },
+            };
+        case START:
+            return {
+                ...state,
+                gameStatus: {
+                    ...state.gameStatus,
+                    gameStarted: true,
                 },
             };
         case CLEAR_GAME_JOIN_STATUS:
