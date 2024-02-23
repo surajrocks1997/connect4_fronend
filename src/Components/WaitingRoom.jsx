@@ -4,15 +4,25 @@ import SockJS from "sockjs-client";
 import Stomp̥ from "stompjs";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { disconnect } from "../Actions/gameData";
+import { useNavigate } from "react-router-dom";
 
 const WaitingRoom = ({
     props,
-    gameData: { loading, gameKey, joinStatus },
-    userInfo: { username },
+    gameData: {
+        loading,
+        gameKey,
+        gameStatus: { joinStatus },
+    },
+    userInfo: { username, isAdmin },
+    disconnect,
 }) => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        if (gameKey == null) return navigate("/game");
+
         const socket = new SockJS("http://localhost:8080/ws-connect4");
         const stompClient = Stomp̥.over(socket);
 
@@ -57,6 +67,9 @@ const WaitingRoom = ({
             //     JSON.stringify({ username, type: "LEAVE" })
             // );
 
+            // TODO
+            disconnect();
+
             stompClient.disconnect(
                 {},
                 {
@@ -64,7 +77,7 @@ const WaitingRoom = ({
                 }
             );
         };
-    }, [dispatch, gameKey, username]);
+    }, [dispatch, navigate, disconnect, gameKey, username]);
 
     return (
         <div>
@@ -79,6 +92,15 @@ const WaitingRoom = ({
                 </div>
             )}
             {joinStatus.length > 0 && joinStatus.map((ele) => <p>{ele}</p>)}
+
+            <hr />
+            {isAdmin ? (
+                <div className="btn join-game-button">
+                    <input type="button" value="START GAME" />
+                </div>
+            ) : (
+                <p>Waiting for Admin to Start the Game... Please be Patient</p>
+            )}
         </div>
     );
 };
@@ -88,6 +110,8 @@ WaitingRoom.propTypes = {
     loading: PropTypes.bool,
     gameKey: PropTypes.string,
     joinStatus: PropTypes.array.isRequired,
+    isAdmin: PropTypes.bool.isRequired,
+    disconnect: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -95,4 +119,4 @@ const mapStateToProps = (state) => ({
     userInfo: state.userInfo,
 });
 
-export default connect(mapStateToProps, {})(WaitingRoom);
+export default connect(mapStateToProps, { disconnect })(WaitingRoom);

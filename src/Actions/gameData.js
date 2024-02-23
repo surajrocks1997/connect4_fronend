@@ -1,10 +1,12 @@
 import axios from "axios";
 
 import {
-    GENERATE_KEY,
+    SET_GAME_KEY,
     JOIN_ROOM,
     JOIN_ROOM_ERROR,
     CLEAR_JOIN_ERROR,
+    IS_ADMIN,
+    CLEAR_GAME_JOIN_STATUS,
 } from "./types";
 
 export const generateKey = () => async (dispatch) => {
@@ -12,8 +14,12 @@ export const generateKey = () => async (dispatch) => {
     const gameKey = await axios.get(url);
 
     dispatch({
-        type: GENERATE_KEY,
+        type: SET_GAME_KEY,
         payload: gameKey.data,
+    });
+    dispatch({
+        type: IS_ADMIN,
+        payload: true,
     });
     return gameKey.data;
 };
@@ -44,5 +50,20 @@ export const setGameKeyInState = (roomKey) => (dispatch) => {
     dispatch({
         type: JOIN_ROOM,
         payload: roomKey,
+    });
+};
+
+export const disconnect = () => (dispatch) => {
+    dispatch({
+        type: SET_GAME_KEY,
+        payload: null,
+    });
+    dispatch({
+        type: IS_ADMIN,
+        payload: false,
+    });
+    dispatch({
+        type: CLEAR_GAME_JOIN_STATUS,
+        payload: null,
     });
 };

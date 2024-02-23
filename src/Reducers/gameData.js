@@ -1,21 +1,26 @@
 import {
-    GENERATE_KEY,
+    SET_GAME_KEY,
     JOIN_ROOM,
     JOIN_ROOM_ERROR,
     CLEAR_JOIN_ERROR,
+    JOIN,
+    LEAVE,
+    CLEAR_GAME_JOIN_STATUS,
 } from "../Actions/types";
 
 const initState = {
     gameKey: null,
     loading: true,
     error: "",
-    joinStatus: [],
+    gameStatus: {
+        joinStatus: [],
+    },
 };
 
 const gameData = (state = initState, action) => {
     const { type, payload } = action;
     switch (type) {
-        case GENERATE_KEY:
+        case SET_GAME_KEY:
             return {
                 ...state,
                 gameKey: payload,
@@ -40,11 +45,22 @@ const gameData = (state = initState, action) => {
                 error: "",
                 loading: true,
             };
-        case "JOIN":
-        case "LEAVE":
+        case JOIN:
+        case LEAVE:
             return {
                 ...state,
-                joinStatus: [...state.joinStatus, payload],
+                gameStatus: {
+                    ...state.gameStatus,
+                    joinStatus: [...state.gameStatus.joinStatus, payload],
+                },
+            };
+        case CLEAR_GAME_JOIN_STATUS:
+            return {
+                ...state,
+                gameStatus: {
+                    ...state.gameStatus,
+                    joinStatus: [],
+                },
             };
         default:
             return state;

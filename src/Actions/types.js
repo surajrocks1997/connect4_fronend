@@ -1,5 +1,9 @@
-export const GENERATE_KEY = "GENERATE_KEY";
+export const SET_GAME_KEY = "SET_GAME_KEY";
 export const JOIN_ROOM = "JOIN_ROOM";
 export const JOIN_ROOM_ERROR = "JOIN_ROOM_ERROR";
 export const CLEAR_JOIN_ERROR = "CLEAR_JOIN_ERROR";
 export const USER_INFO = "USER_INFO";
+export const IS_ADMIN = "IS_ADMIN";
+export const JOIN = "JOIN"
+export const LEAVE = "LEAVE"
+export const CLEAR_GAME_JOIN_STATUS = "CLEAR_GAME_JOIN_STATUS"

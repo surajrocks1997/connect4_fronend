@@ -1,7 +1,8 @@
-import { USER_INFO } from "../Actions/types";
+import { USER_INFO, IS_ADMIN } from "../Actions/types";
 
 const initState = {
     username: null,
+    isAdmin: false,
 };
 
 const userInfo = (state = initState, action) => {
@@ -11,6 +12,11 @@ const userInfo = (state = initState, action) => {
             return {
                 ...state,
                 username: payload,
+            };
+        case IS_ADMIN:
+            return {
+                ...state,
+                isAdmin: payload,
             };
 
         default:
