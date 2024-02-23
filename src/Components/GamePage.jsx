@@ -6,7 +6,7 @@ import {
     joinRoomValidation,
 } from "../Actions/gameData";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const GamePage = ({
     generateKey,
@@ -15,6 +15,10 @@ const GamePage = ({
     userInfo: { username },
     gameData: { error },
 }) => {
+    useEffect(() => {
+        if (username === null || username === "") navigate("/");
+    }, [username]);
+
     const [joinBox, setJoinBox] = useState(false);
     const [roomkey, setRoomKey] = useState("");
     const navigate = useNavigate();

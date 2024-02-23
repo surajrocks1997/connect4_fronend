@@ -15,6 +15,7 @@ const WelcomePage = ({ setUserName }) => {
     };
 
     const submit = () => {
+        if (!name || name === "") return;
         setUserName(name);
         navigate("/game");
     };
