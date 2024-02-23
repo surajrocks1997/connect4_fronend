@@ -15,13 +15,14 @@ const GamePage = ({
     userInfo: { username },
     gameData: { error },
 }) => {
+    const navigate = useNavigate();
+
     useEffect(() => {
         if (username === null || username === "") navigate("/");
-    }, [username]);
+    }, [username, navigate]);
 
     const [joinBox, setJoinBox] = useState(false);
     const [roomkey, setRoomKey] = useState("");
-    const navigate = useNavigate();
 
     const createRoom = async () => {
         const generatedKey = await generateKey();

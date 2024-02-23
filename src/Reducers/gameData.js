@@ -15,6 +15,7 @@ const initState = {
     gameStatus: {
         joinStatus: [],
         players: 0,
+        gameStarted: false
     },
 };
 

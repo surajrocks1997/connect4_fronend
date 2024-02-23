@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import SockJS from "sockjs-client";
-import Stomp̥ from "stompjs";
+import Stomp from "stompjs";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { disconnect } from "../Actions/gameData";
@@ -24,7 +24,7 @@ const WaitingRoom = ({
         if (gameKey == null) return navigate("/game");
 
         const socket = new SockJS("http://localhost:8080/ws-connect4");
-        const stompClient = Stomp̥.over(socket);
+        const stompClient = Stomp.over(socket);
 
         const onConnected = (frame) => {
             console.log(frame);
