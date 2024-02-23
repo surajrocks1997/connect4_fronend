@@ -14,6 +14,7 @@ const initState = {
     error: "",
     gameStatus: {
         joinStatus: [],
+        players: 0,
     },
 };
 
@@ -46,11 +47,20 @@ const gameData = (state = initState, action) => {
                 loading: true,
             };
         case JOIN:
+            return {
+                ...state,
+                gameStatus: {
+                    ...state.gameStatus,
+                    players: state.gameStatus.players + 1,
+                    joinStatus: [...state.gameStatus.joinStatus, payload],
+                },
+            };
         case LEAVE:
             return {
                 ...state,
                 gameStatus: {
                     ...state.gameStatus,
+                    players: state.gameStatus.players - 1,
                     joinStatus: [...state.gameStatus.joinStatus, payload],
                 },
             };
@@ -59,6 +69,7 @@ const gameData = (state = initState, action) => {
                 ...state,
                 gameStatus: {
                     ...state.gameStatus,
+                    players: state.gameStatus.players - 1,
                     joinStatus: [],
                 },
             };

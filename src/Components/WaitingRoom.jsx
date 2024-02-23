@@ -12,7 +12,7 @@ const WaitingRoom = ({
     gameData: {
         loading,
         gameKey,
-        gameStatus: { joinStatus },
+        gameStatus: { joinStatus, players },
     },
     userInfo: { username, isAdmin },
     disconnect,
@@ -91,13 +91,22 @@ const WaitingRoom = ({
                     Your GAME KEY is : {gameKey} <br />{" "}
                 </div>
             )}
-            {joinStatus.length > 0 && joinStatus.map((ele) => <p>{ele}</p>)}
+            {joinStatus.length > 0 &&
+                joinStatus.map((ele) => <p key={ele}>{ele}</p>)}
 
             <hr />
+
             {isAdmin ? (
-                <div className="btn join-game-button">
-                    <input type="button" value="START GAME" />
-                </div>
+                players > 1 ? (
+                    <div className="btn join-game-button">
+                        <input type="button" value="START GAME" />
+                    </div>
+                ) : (
+                    <p>
+                        Share this Game Key with your Friend to join this Game
+                        Room
+                    </p>
+                )
             ) : (
                 <p>Waiting for Admin to Start the Game... Please be Patient</p>
             )}
@@ -109,9 +118,10 @@ WaitingRoom.propTypes = {
     username: PropTypes.string,
     loading: PropTypes.bool,
     gameKey: PropTypes.string,
-    joinStatus: PropTypes.array.isRequired,
-    isAdmin: PropTypes.bool.isRequired,
+    joinStatus: PropTypes.array,
+    isAdmin: PropTypes.bool,
     disconnect: PropTypes.func.isRequired,
+    players: PropTypes.number,
 };
 
 const mapStateToProps = (state) => ({
