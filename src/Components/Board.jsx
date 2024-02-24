@@ -14,7 +14,7 @@ const Board = ({
 }) => {
     const dispatch = useDispatch();
     const [grid, setGrid] = useState(
-        Array(rows).fill(Array(cols).fill("/empty.png"))
+        Array(rows).fill(Array(cols).fill("/transparent.png"))
     );
 
     const updateGrid = (updatedGrid) => {
@@ -23,7 +23,7 @@ const Board = ({
                 if (updatedGrid[rIndex][cellIndex] === 1) return "/redDot.png";
                 else if (updatedGrid[rIndex][cellIndex] === 2)
                     return "/greenDot.png";
-                else return "/empty.png";
+                else return "/transparent.png";
             })
         );
 
