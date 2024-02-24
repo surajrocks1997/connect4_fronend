@@ -17,6 +17,19 @@ const Board = ({
         Array(rows).fill(Array(cols).fill("/empty.png"))
     );
 
+    const updateGrid = (updatedGrid) => {
+        const newGrid = grid.map((row, rIndex) =>
+            row.map((cell, cellIndex) => {
+                if (updatedGrid[rIndex][cellIndex] === 1) return "/redDot.png";
+                else if (updatedGrid[rIndex][cellIndex] === 2)
+                    return "/greenDot.png";
+                else return "/empty.png";
+            })
+        );
+
+        setGrid(newGrid);
+    };
+
     useEffect(() => {
         const onConnected = (frame) => {
             console.log(frame);
@@ -30,17 +43,7 @@ const Board = ({
                     payload: updatedGrid,
                 });
 
-                const newGrid = grid.map((row, rIndex) =>
-                    row.map((cell, cellIndex) => {
-                        if (updatedGrid[rIndex][cellIndex] === 1)
-                            return "/redDot.png";
-                        else if (updatedGrid[rIndex][cellIndex] === 2)
-                            return "/greenDot.png";
-                        else return "/empty.png";
-                    })
-                );
-
-                setGrid(newGrid);
+                updateGrid(updatedGrid);
             };
 
             stompClient.subscribe(
@@ -57,7 +60,7 @@ const Board = ({
         };
 
         stompClient.connect({}, onConnected, onError);
-    }, [dispatch, gameKey, grid]);
+    }, [dispatch, gameKey]);
 
     const handleCellClick = (rowIndex, colIndex) => {
         stompClient.send(
