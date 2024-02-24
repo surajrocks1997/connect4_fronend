@@ -8,6 +8,7 @@ import {
     IS_ADMIN,
     CLEAR_GAME_JOIN_STATUS,
     MOVE_IDENTIFIER,
+    INIT_BOARD,
 } from "./types";
 
 export const generateKey = () => async (dispatch) => {
@@ -78,9 +79,11 @@ export const disconnect = () => (dispatch) => {
     });
 };
 
-export const getBoard = () => async (dispatch) => {
+export const getBoard = (rows, cols) => async (dispatch) => {
     console.log("INSIDE INIT BOARD");
-    const url = "http://localhost:8080/boardState";
-    const board = await axios.get(url);
-    console.log(board.data);
+    const grid = Array(rows).fill(Array(cols).fill(0));
+    dispatch({
+        type: INIT_BOARD,
+        payload: grid,
+    });
 };

@@ -7,6 +7,8 @@ import {
     LEAVE,
     CLEAR_GAME_JOIN_STATUS,
     START,
+    INIT_BOARD,
+    MOVE,
 } from "../Actions/types";
 
 const initState = {
@@ -78,6 +80,16 @@ const gameData = (state = initState, action) => {
                     ...state.gameStatus,
                     gameStarted: true,
                 },
+            };
+        case INIT_BOARD:
+            return {
+                ...state,
+                board: payload,
+            };
+        case MOVE:
+            return {
+                ...state,
+                board: payload,
             };
         case CLEAR_GAME_JOIN_STATUS:
             return {

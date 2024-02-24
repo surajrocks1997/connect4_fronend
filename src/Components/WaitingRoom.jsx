@@ -15,6 +15,7 @@ const WaitingRoom = ({
         loading,
         gameKey,
         gameStatus: { joinStatus, players, gameStarted },
+        gameSettings: { rows, cols },
     },
     userInfo: { username, isAdmin },
     disconnect,
@@ -82,8 +83,8 @@ const WaitingRoom = ({
         };
     }, [dispatch, navigate, disconnect, gameKey, username]);
 
-    const startGame = async () => {
-        await getBoard();
+    const startGame = () => {
+        getBoard(rows, cols);
         stompClient.send(
             `/app/game.startGame/${gameKey}`,
             {},
@@ -142,6 +143,8 @@ WaitingRoom.propTypes = {
     players: PropTypes.number,
     gameStarted: PropTypes.bool,
     getBoard: PropTypes.func.isRequired,
+    rows: PropTypes.number,
+    cols: PropTypes.number,
 };
 
 const mapStateToProps = (state) => ({

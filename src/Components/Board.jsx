@@ -1,30 +1,70 @@
 import { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
+import { MOVE } from "../Actions/types";
 
 const Board = ({
     stompClient,
     userInfo: { moveIdentifier },
     gameData: {
         board,
+        gameKey,
         gameSettings: { rows, cols },
     },
 }) => {
-    // Initialize the grid state
+    const dispatch = useDispatch();
     const [grid, setGrid] = useState(
-        Array(rows).fill(Array(cols).fill("/greenDot.png"))
+        Array(rows).fill(Array(cols).fill("/empty.png"))
     );
 
-    // Function to handle cell click
+    useEffect(() => {
+        const onConnected = (frame) => {
+            console.log(frame);
+
+            const onMessageRecieved = (payload) => {
+                var message = JSON.parse(payload.body);
+                const updatedGrid = message.board;
+
+                dispatch({
+                    type: MOVE,
+                    payload: updatedGrid,
+                });
+
+                const newGrid = grid.map((row, rIndex) =>
+                    row.map((cell, cellIndex) => {
+                        if (updatedGrid[rIndex][cellIndex] === 1)
+                            return "/redDot.png";
+                        else if (updatedGrid[rIndex][cellIndex] === 2)
+                            return "/greenDot.png";
+                        else return "/empty.png";
+                    })
+                );
+
+                setGrid(newGrid);
+            };
+
+            stompClient.subscribe(
+                "/topic/" + gameKey + "/game",
+                onMessageRecieved
+            );
+        };
+
+        const onError = (error) => {
+            console.log(error);
+            console.log(
+                "Could not connect to WebSocket server. Please refresh this page to try again!"
+            );
+        };
+
+        stompClient.connect({}, onConnected, onError);
+    }, [dispatch, gameKey, grid]);
+
     const handleCellClick = (rowIndex, colIndex) => {
-        // Create a copy of the grid
-        const newGrid = [...grid];
-
-        // Update the cell value in the copy of the grid
-        newGrid[rowIndex][colIndex] = "/redDot.png"; // Update with the new image URL
-
-        // Update the state with the new grid
-        setGrid(newGrid);
+        stompClient.send(
+            `/app/game.move/${gameKey}`,
+            {},
+            JSON.stringify({ colIndex, moveIdentifier, board })
+        );
     };
 
     return (
@@ -49,10 +89,11 @@ const Board = ({
 
 Board.propTypes = {
     moveIdentifier: PropTypes.number,
-    board: PropTypes.array,
     rows: PropTypes.number,
     cols: PropTypes.number,
     stompClient: PropTypes.object.isRequired,
+    gameKey: PropTypes.string,
+    board: PropTypes.array,
 };
 
 const mapStateToProps = (state) => ({
