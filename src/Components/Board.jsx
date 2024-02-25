@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
-import { MOVE } from "../Actions/types";
+import { MOVE, WON } from "../Actions/types";
+import { changeTurn } from "../Actions/gameData";
 
 const Board = ({
     stompClient,
+    changeTurn,
     userInfo: { moveIdentifier },
     gameData: {
         board,
         gameKey,
         gameSettings: { rows, cols },
+        wonStatus: { won, player },
+        gameStatus: { turn },
     },
 }) => {
     const dispatch = useDispatch();
@@ -35,13 +39,22 @@ const Board = ({
             console.log(frame);
 
             const onMessageRecieved = (payload) => {
+                console.log("FROM ON MESSAGE RECIEVED: IN BOARD");
+                console.log(payload.body);
                 var message = JSON.parse(payload.body);
                 const updatedGrid = message.board;
+                changeTurn(message.turn);
 
                 dispatch({
                     type: MOVE,
                     payload: updatedGrid,
                 });
+                if (message.hasWon === true) {
+                    dispatch({
+                        type: WON,
+                        payload: message.moveIdentifier,
+                    });
+                }
 
                 updateGrid(updatedGrid);
             };
@@ -60,14 +73,21 @@ const Board = ({
         };
 
         stompClient.connect({}, onConnected, onError);
+
+        return () => {
+            stompClient.disconnect();
+        };
     }, [dispatch, gameKey]);
 
     const handleCellClick = (rowIndex, colIndex) => {
-        stompClient.send(
-            `/app/game.move/${gameKey}`,
-            {},
-            JSON.stringify({ colIndex, moveIdentifier, board })
-        );
+        if (won === true) return;
+        if (turn === moveIdentifier) {
+            stompClient.send(
+                `/app/game.move/${gameKey}`,
+                {},
+                JSON.stringify({ colIndex, moveIdentifier, board })
+            );
+        }
     };
 
     return (
@@ -86,6 +106,17 @@ const Board = ({
                     ))}
                 </div>
             ))}
+
+            <br />
+            {!won && (
+                <p>
+                    {turn === moveIdentifier
+                        ? "Your "
+                        : "Please Wait. It's Opponent's "}
+                    turn
+                </p>
+            )}
+            {won && <p>YOU {player === moveIdentifier ? "WIN" : "LOSE!!"}</p>}
         </div>
     );
 };
@@ -97,6 +128,10 @@ Board.propTypes = {
     stompClient: PropTypes.object.isRequired,
     gameKey: PropTypes.string,
     board: PropTypes.array,
+    won: PropTypes.bool,
+    player: PropTypes.number,
+    turn: PropTypes.number,
+    changeTurn: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -104,4 +139,4 @@ const mapStateToProps = (state) => ({
     userInfo: state.userInfo,
 });
 
-export default connect(mapStateToProps, {})(Board);
+export default connect(mapStateToProps, { changeTurn })(Board);

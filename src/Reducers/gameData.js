@@ -9,6 +9,8 @@ import {
     START,
     INIT_BOARD,
     MOVE,
+    WON,
+    CHANGE_TURN,
 } from "../Actions/types";
 
 const initState = {
@@ -19,6 +21,11 @@ const initState = {
         joinStatus: [],
         players: 0,
         gameStarted: false,
+        turn: 1,
+    },
+    wonStatus: {
+        won: false,
+        player: 0,
     },
     gameSettings: {
         rows: 6,
@@ -91,6 +98,23 @@ const gameData = (state = initState, action) => {
                 ...state,
                 board: payload,
             };
+        case WON:
+            return {
+                ...state,
+                wonStatus: {
+                    won: true,
+                    player: payload,
+                },
+            };
+        case CHANGE_TURN: {
+            return {
+                ...state,
+                gameStatus: {
+                    ...state.gameStatus,
+                    turn: payload,
+                },
+            };
+        }
         case CLEAR_GAME_JOIN_STATUS:
             return {
                 ...state,

@@ -9,6 +9,7 @@ import {
     CLEAR_GAME_JOIN_STATUS,
     MOVE_IDENTIFIER,
     INIT_BOARD,
+    CHANGE_TURN,
 } from "./types";
 
 export const generateKey = () => async (dispatch) => {
@@ -85,5 +86,12 @@ export const getBoard = (rows, cols) => async (dispatch) => {
     dispatch({
         type: INIT_BOARD,
         payload: grid,
+    });
+};
+
+export const changeTurn = (changeTurn) => (dispatch) => {
+    dispatch({
+        type: CHANGE_TURN,
+        payload: changeTurn,
     });
 };
