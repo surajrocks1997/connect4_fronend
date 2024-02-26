@@ -1,13 +1,12 @@
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import SockJS from "sockjs-client";
-import Stomp from "stompjs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { disconnect, getBoard } from "../Actions/gameData";
 import { useNavigate } from "react-router-dom";
 
 import Board from "./Board";
+import webSocketService from "../class/WebSocketService";
 
 const WaitingRoom = ({
     props,
@@ -23,53 +22,38 @@ const WaitingRoom = ({
 }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    const socket = new SockJS("http://localhost:8080/ws-connect4");
-    const stompClient = Stomp.over(socket);
+    const [stompClient, setStompClient] = useState(null);
 
     useEffect(() => {
+        const stompClient = webSocketService.getStompClient();
+        setStompClient(stompClient);
         if (gameKey == null) return navigate("/game");
 
-        const onConnected = (frame) => {
-            console.log(frame);
-
-            const onMessageRecieved = (payload) => {
-                console.log("FROM ON MESSAGE RECIEVED");
-                var message = JSON.parse(payload.body);
-                if (message.type === "JOIN" || message.type === "LEAVE") {
-                    dispatch({
-                        type: message.type,
-                        payload:
-                            message.username +
-                            (message.type === "JOIN" ? " joined" : " left!!"),
-                    });
-                } else {
-                    dispatch({
-                        type: message.type,
-                        payload: true,
-                    });
-                }
-            };
-
-            stompClient.subscribe(
-                "/topic/" + gameKey + "/key",
-                onMessageRecieved
-            );
-
-            stompClient.send(
-                `/app/game.addUser/${gameKey}`,
-                {},
-                JSON.stringify({ username, type: "JOIN" })
-            );
-        };
-        const onError = (error) => {
-            console.log(error);
-            console.log(
-                "Could not connect to WebSocket server. Please refresh this page to try again!"
-            );
+        const onMessageRecieved = (payload) => {
+            console.log("FROM ON MESSAGE RECIEVED");
+            var message = JSON.parse(payload.body);
+            if (message.type === "JOIN" || message.type === "LEAVE") {
+                dispatch({
+                    type: message.type,
+                    payload:
+                        message.username +
+                        (message.type === "JOIN" ? " joined" : " left!!"),
+                });
+            } else {
+                dispatch({
+                    type: message.type,
+                    payload: true,
+                });
+            }
         };
 
-        stompClient.connect({}, onConnected, onError);
+        stompClient.subscribe("/topic/" + gameKey + "/key", onMessageRecieved);
+
+        stompClient.send(
+            `/app/game.addUser/${gameKey}`,
+            {},
+            JSON.stringify({ username, type: "JOIN" })
+        );
 
         return () => {
             disconnect();

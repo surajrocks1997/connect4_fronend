@@ -3,9 +3,9 @@ import { connect, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { MOVE, WON } from "../Actions/types";
 import { changeTurn } from "../Actions/gameData";
+import webSocketService from "../class/WebSocketService";
 
 const Board = ({
-    stompClient,
     changeTurn,
     userInfo: { moveIdentifier },
     gameData: {
@@ -20,6 +20,7 @@ const Board = ({
     const [grid, setGrid] = useState(
         Array(rows).fill(Array(cols).fill("/transparent.png"))
     );
+    const [stompClient, setStompClient] = useState(null);
 
     const updateGrid = (updatedGrid) => {
         const newGrid = grid.map((row, rIndex) =>
@@ -35,44 +36,31 @@ const Board = ({
     };
 
     useEffect(() => {
-        const onConnected = (frame) => {
-            console.log(frame);
+        const stompClient = webSocketService.getStompClient();
+        setStompClient(stompClient);
 
-            const onMessageRecieved = (payload) => {
-                console.log("FROM ON MESSAGE RECIEVED: IN BOARD");
-                console.log(payload.body);
-                var message = JSON.parse(payload.body);
-                const updatedGrid = message.board;
-                changeTurn(message.turn);
+        const onMessageRecieved = (payload) => {
+            console.log("FROM ON MESSAGE RECIEVED: IN BOARD");
+            console.log(payload.body);
+            var message = JSON.parse(payload.body);
+            const updatedGrid = message.board;
+            changeTurn(message.turn);
 
+            dispatch({
+                type: MOVE,
+                payload: updatedGrid,
+            });
+            if (message.hasWon === true) {
                 dispatch({
-                    type: MOVE,
-                    payload: updatedGrid,
+                    type: WON,
+                    payload: message.moveIdentifier,
                 });
-                if (message.hasWon === true) {
-                    dispatch({
-                        type: WON,
-                        payload: message.moveIdentifier,
-                    });
-                }
+            }
 
-                updateGrid(updatedGrid);
-            };
-
-            stompClient.subscribe(
-                "/topic/" + gameKey + "/game",
-                onMessageRecieved
-            );
+            updateGrid(updatedGrid);
         };
 
-        const onError = (error) => {
-            console.log(error);
-            console.log(
-                "Could not connect to WebSocket server. Please refresh this page to try again!"
-            );
-        };
-
-        stompClient.connect({}, onConnected, onError);
+        stompClient.subscribe("/topic/" + gameKey + "/game", onMessageRecieved);
 
         return () => {
             stompClient.disconnect();

@@ -4,6 +4,7 @@ import Stomp from "stompjs";
 class WebSocketService {
     constructor() {
         this.stompClient = null;
+        this.initWebSocket();
     }
 
     initWebSocket() {
@@ -25,9 +26,6 @@ class WebSocketService {
     }
 
     getStompClient() {
-        if (!this.stompClient) {
-            this.initWebSocket();
-        }
         return this.stompClient;
     }
 
