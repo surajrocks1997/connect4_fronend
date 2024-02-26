@@ -13,3 +13,4 @@ export const CHANGE_TURN = "CHANGE_TURN";
 export const CLEAR_GAME_JOIN_STATUS = "CLEAR_GAME_JOIN_STATUS";
 export const MOVE_IDENTIFIER = "MOVE_IDENTIFIER";
 export const INIT_BOARD = "INIT_BOARD";
+export const IS_LOADING = "IS_LOADING";
