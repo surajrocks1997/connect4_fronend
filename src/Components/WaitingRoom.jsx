@@ -69,7 +69,6 @@ const WaitingRoom = ({
     }, [dispatch, navigate, disconnect, gameKey, username]);
 
     const startGame = () => {
-        getBoard(rows, cols);
         stompClient.send(
             `/app/game.startGame/${gameKey}`,
             {},
@@ -78,7 +77,7 @@ const WaitingRoom = ({
     };
 
     return gameStarted ? (
-        <Board stompClient={stompClient} />
+        <Board />
     ) : (
         <div>
             <div className="title">Waiting Room</div>

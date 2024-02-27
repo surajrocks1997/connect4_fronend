@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { MOVE, WON } from "../Actions/types";
-import { changeTurn } from "../Actions/gameData";
+import { changeTurn, getBoard } from "../Actions/gameData";
 import webSocketService from "../class/WebSocketService";
-import JoinLeaveStatus from "./JoinLeaveStatus";
+import Spinner from "./Spinner/Spinner";
 
 const Board = ({
     changeTurn,
+    getBoard,
     userInfo: { moveIdentifier },
     gameData: {
         board,
@@ -17,6 +18,7 @@ const Board = ({
         gameStatus: { turn },
         players,
     },
+    loading: { globalLoading },
 }) => {
     const dispatch = useDispatch();
     const [grid, setGrid] = useState(
@@ -38,6 +40,8 @@ const Board = ({
     };
 
     useEffect(() => {
+        getBoard(gameKey);
+
         const stompClient = webSocketService.getStompClient();
         setStompClient(stompClient);
 
@@ -58,7 +62,6 @@ const Board = ({
                     payload: message.moveIdentifier,
                 });
             }
-
             updateGrid(updatedGrid);
         };
 
@@ -67,7 +70,7 @@ const Board = ({
         return () => {
             stompClient.unsubscribe("/topic/" + gameKey + "/game");
         };
-    }, [dispatch, gameKey]);
+    }, [dispatch, gameKey, getBoard]);
 
     const handleCellClick = (rowIndex, colIndex) => {
         if (won === true) return;
@@ -80,7 +83,9 @@ const Board = ({
         }
     };
 
-    return (
+    return globalLoading ? (
+        <Spinner />
+    ) : (
         <div className="board">
             {grid.map((row, rowIndex) => (
                 <div key={rowIndex} className="wrapper">
@@ -121,18 +126,21 @@ Board.propTypes = {
     moveIdentifier: PropTypes.number,
     rows: PropTypes.number,
     cols: PropTypes.number,
-    stompClient: PropTypes.object.isRequired,
+    stompClient: PropTypes.object,
     gameKey: PropTypes.string,
     board: PropTypes.array,
     won: PropTypes.bool,
     player: PropTypes.number,
     turn: PropTypes.number,
     changeTurn: PropTypes.func,
+    setGlobalLoadingState: PropTypes.func,
+    getBoard: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
     gameData: state.gameData,
     userInfo: state.userInfo,
+    loading: state.loading,
 });
 
-export default connect(mapStateToProps, { changeTurn })(Board);
+export default connect(mapStateToProps, { changeTurn, getBoard })(Board);

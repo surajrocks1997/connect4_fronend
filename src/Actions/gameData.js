@@ -10,6 +10,7 @@ import {
     MOVE_IDENTIFIER,
     INIT_BOARD,
     CHANGE_TURN,
+    IS_LOADING,
 } from "./types";
 
 export const generateKey = () => async (dispatch) => {
@@ -80,13 +81,25 @@ export const disconnect = () => (dispatch) => {
     });
 };
 
-export const getBoard = (rows, cols) => async (dispatch) => {
+export const getBoard = (roomKey) => async (dispatch) => {
     console.log("INSIDE INIT BOARD");
-    const grid = Array(rows).fill(Array(cols).fill(0));
-    dispatch({
-        type: INIT_BOARD,
-        payload: grid,
-    });
+    // const grid = Array(rows).fill(Array(cols).fill(0));
+    try {
+        const grid = await axios.get(
+            `http://localhost:8080/boardState?roomKey=${roomKey}`
+        );
+        
+        dispatch({
+            type: INIT_BOARD,
+            payload: grid.data,
+        });
+        dispatch({
+            type: IS_LOADING,
+            payload: false,
+        });
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 export const changeTurn = (changeTurn) => (dispatch) => {

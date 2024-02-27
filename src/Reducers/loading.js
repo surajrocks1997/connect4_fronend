@@ -1,7 +1,7 @@
 import { IS_LOADING } from "../Actions/types";
 
 const initState = {
-    loading: false,
+    globalLoading: true,
 };
 
 const loading = (state = initState, action) => {
@@ -10,7 +10,7 @@ const loading = (state = initState, action) => {
         case IS_LOADING:
             return {
                 ...state,
-                loading: payload,
+                globalLoading: payload,
             };
 
         default:
