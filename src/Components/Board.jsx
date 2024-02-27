@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { MOVE, WON } from "../Actions/types";
 import { changeTurn } from "../Actions/gameData";
 import webSocketService from "../class/WebSocketService";
+import JoinLeaveStatus from "./JoinLeaveStatus";
 
 const Board = ({
     changeTurn,
@@ -14,6 +15,7 @@ const Board = ({
         gameSettings: { rows, cols },
         wonStatus: { won, player },
         gameStatus: { turn },
+        players,
     },
 }) => {
     const dispatch = useDispatch();
@@ -63,7 +65,7 @@ const Board = ({
         stompClient.subscribe("/topic/" + gameKey + "/game", onMessageRecieved);
 
         return () => {
-            stompClient.disconnect();
+            stompClient.unsubscribe("/topic/" + gameKey + "/game");
         };
     }, [dispatch, gameKey]);
 
@@ -104,7 +106,13 @@ const Board = ({
                     turn
                 </p>
             )}
-            {won && <p>YOU {player === moveIdentifier ? "WIN" : "LOSE!!"}</p>}
+            {won && (
+                <div>
+                    <p>YOU {player === moveIdentifier ? "WIN" : "LOSE!!"}</p>
+                    <input type="button" value="REMATCH" />
+                </div>
+            )}
+            <br />
         </div>
     );
 };

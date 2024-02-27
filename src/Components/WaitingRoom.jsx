@@ -7,13 +7,14 @@ import { useNavigate } from "react-router-dom";
 
 import Board from "./Board";
 import webSocketService from "../class/WebSocketService";
+import JoinLeaveStatus from "./JoinLeaveStatus";
 
 const WaitingRoom = ({
     props,
     gameData: {
         loading,
         gameKey,
-        gameStatus: { joinStatus, players, gameStarted },
+        gameStatus: { players, gameStarted },
         gameSettings: { rows, cols },
     },
     userInfo: { username, isAdmin },
@@ -57,13 +58,13 @@ const WaitingRoom = ({
 
         return () => {
             disconnect();
-
-            stompClient.disconnect(
+            stompClient.send(
+                `/app/game.removeUser/${gameKey}`,
                 {},
-                {
-                    gameKey,
-                }
+                JSON.stringify({ username, type: "LEAVE" })
             );
+
+            stompClient.unsubscribe("/topic/" + gameKey + "/key");
         };
     }, [dispatch, navigate, disconnect, gameKey, username]);
 
@@ -90,8 +91,9 @@ const WaitingRoom = ({
                     Your GAME KEY is : {gameKey} <br />{" "}
                 </div>
             )}
-            {joinStatus.length > 0 &&
-                joinStatus.map((ele) => <p key={ele}>{ele}</p>)}
+            <JoinLeaveStatus />
+            {/* {joinStatus.length > 0 &&
+                joinStatus.map((ele, index) => <p key={index}>{ele}</p>)} */}
 
             <hr />
 
