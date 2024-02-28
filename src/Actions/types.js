@@ -9,6 +9,7 @@ export const LEAVE = "LEAVE";
 export const MOVE = "MOVE";
 export const START = "START";
 export const WON = "WON";
+export const RESET_WON = "RESET_WON";
 export const CHANGE_TURN = "CHANGE_TURN";
 export const CLEAR_GAME_JOIN_STATUS = "CLEAR_GAME_JOIN_STATUS";
 export const MOVE_IDENTIFIER = "MOVE_IDENTIFIER";

@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
-import { MOVE, WON } from "../Actions/types";
-import { changeTurn, getBoard } from "../Actions/gameData";
+import { INIT_BOARD, MOVE, WON } from "../Actions/types";
+import { changeTurn, getBoard, reset } from "../Actions/gameData";
 import webSocketService from "../class/WebSocketService";
 import Spinner from "./Spinner/Spinner";
+import { setGlobalLoadingState } from "../Actions/loadingState";
 
 const Board = ({
     changeTurn,
     getBoard,
+    reset,
     userInfo: { moveIdentifier },
     gameData: {
         board,
@@ -19,6 +21,7 @@ const Board = ({
         players,
     },
     loading: { globalLoading },
+    setGlobalLoadingState,
 }) => {
     const dispatch = useDispatch();
     const [grid, setGrid] = useState(
@@ -49,20 +52,32 @@ const Board = ({
             console.log("FROM ON MESSAGE RECIEVED: IN BOARD");
             console.log(payload.body);
             var message = JSON.parse(payload.body);
-            const updatedGrid = message.board;
-            changeTurn(message.turn);
 
-            dispatch({
-                type: MOVE,
-                payload: updatedGrid,
-            });
-            if (message.hasWon === true) {
+            if (message.type === "RESET") {
                 dispatch({
-                    type: WON,
-                    payload: message.moveIdentifier,
+                    type: INIT_BOARD,
+                    payload: message.board,
                 });
+                updateGrid(message.board);
+                changeTurn(message.turn);
+                reset(moveIdentifier);
+                setGlobalLoadingState(false)
+            } else {
+                const updatedGrid = message.board;
+                changeTurn(message.turn);
+
+                dispatch({
+                    type: MOVE,
+                    payload: updatedGrid,
+                });
+                if (message.hasWon === true) {
+                    dispatch({
+                        type: WON,
+                        payload: message.moveIdentifier,
+                    });
+                }
+                updateGrid(updatedGrid);
             }
-            updateGrid(updatedGrid);
         };
 
         stompClient.subscribe("/topic/" + gameKey + "/game", onMessageRecieved);
@@ -70,7 +85,7 @@ const Board = ({
         return () => {
             stompClient.unsubscribe("/topic/" + gameKey + "/game");
         };
-    }, [dispatch, gameKey, getBoard]);
+    }, [dispatch]);
 
     const handleCellClick = (rowIndex, colIndex) => {
         if (won === true) return;
@@ -81,6 +96,16 @@ const Board = ({
                 JSON.stringify({ colIndex, moveIdentifier, board })
             );
         }
+    };
+
+    const resetBoard = () => {
+        setGlobalLoadingState(true);
+
+        stompClient.send(
+            `/app/game.move/${gameKey}`,
+            {},
+            JSON.stringify({ turn, type: "RESET" })
+        );
     };
 
     return globalLoading ? (
@@ -114,7 +139,7 @@ const Board = ({
             {won && (
                 <div>
                     <p>YOU {player === moveIdentifier ? "WIN" : "LOSE!!"}</p>
-                    <input type="button" value="REMATCH" />
+                    <input type="button" value="REMATCH" onClick={resetBoard} />
                 </div>
             )}
             <br />
@@ -135,6 +160,7 @@ Board.propTypes = {
     changeTurn: PropTypes.func,
     setGlobalLoadingState: PropTypes.func,
     getBoard: PropTypes.func,
+    reset: PropTypes.func,
 };
 
 const mapStateToProps = (state) => ({
@@ -143,4 +169,9 @@ const mapStateToProps = (state) => ({
     loading: state.loading,
 });
 
-export default connect(mapStateToProps, { changeTurn, getBoard })(Board);
+export default connect(mapStateToProps, {
+    changeTurn,
+    getBoard,
+    reset,
+    setGlobalLoadingState,
+})(Board);

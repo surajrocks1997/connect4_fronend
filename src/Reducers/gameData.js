@@ -11,6 +11,7 @@ import {
     MOVE,
     WON,
     CHANGE_TURN,
+    RESET_WON,
 } from "../Actions/types";
 
 const initState = {
@@ -104,6 +105,14 @@ const gameData = (state = initState, action) => {
                 wonStatus: {
                     won: true,
                     player: payload,
+                },
+            };
+        case RESET_WON:
+            return {
+                ...state,
+                wonStatus: {
+                    won: payload,
+                    player: 0,
                 },
             };
         case CHANGE_TURN: {

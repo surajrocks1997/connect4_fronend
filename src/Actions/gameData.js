@@ -11,7 +11,9 @@ import {
     INIT_BOARD,
     CHANGE_TURN,
     IS_LOADING,
+    RESET_WON,
 } from "./types";
+import { setGlobalLoadingState } from "./loadingState";
 
 export const generateKey = () => async (dispatch) => {
     const url = "http://localhost:8080/generateRoomKey";
@@ -88,7 +90,7 @@ export const getBoard = (roomKey) => async (dispatch) => {
         const grid = await axios.get(
             `http://localhost:8080/boardState?roomKey=${roomKey}`
         );
-        
+
         dispatch({
             type: INIT_BOARD,
             payload: grid.data,
@@ -100,6 +102,19 @@ export const getBoard = (roomKey) => async (dispatch) => {
     } catch (error) {
         console.log(error);
     }
+};
+
+export const reset = (moveIdentifier) => async (dispatch) => {
+    console.log("RESET BOARD");
+
+    // dispatch({
+    //     type: MOVE_IDENTIFIER,
+    //     payload: moveIdentifier === 1 ? 2 : 1,
+    // });
+    dispatch({
+        type: RESET_WON,
+        payload: false,
+    });
 };
 
 export const changeTurn = (changeTurn) => (dispatch) => {
