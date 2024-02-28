@@ -1,4 +1,4 @@
-import { USER_INFO } from "./types";
+import { CLEAR_USER_METADATA, USER_INFO } from "./types";
 
 export const setUserName = (name) => (dispatch) => {
     dispatch({
@@ -6,3 +6,10 @@ export const setUserName = (name) => (dispatch) => {
         payload: name,
     });
 };
+
+export const clearUserMetadata = () => (dispatch) => {
+    dispatch({
+        type: CLEAR_USER_METADATA,
+        payload: null
+    })
+}

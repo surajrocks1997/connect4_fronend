@@ -12,6 +12,7 @@ import {
     WON,
     CHANGE_TURN,
     RESET_WON,
+    CLEAR_GAME_DATA,
 } from "../Actions/types";
 
 const initState = {
@@ -132,6 +133,23 @@ const gameData = (state = initState, action) => {
                     players: state.gameStatus.players - 1,
                     joinStatus: [],
                 },
+            };
+        case CLEAR_GAME_DATA:
+            return {
+                ...state,
+                gameKey: null,
+                loading: false,
+                gameStatus: {
+                    joinStatus: [],
+                    players: 0,
+                    gameStarted: false,
+                    turn: 1,
+                },
+                wonStatus: {
+                    won: false,
+                    player: 0,
+                },
+                board: [],
             };
         default:
             return state;

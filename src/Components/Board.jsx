@@ -2,10 +2,17 @@ import { useEffect, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { INIT_BOARD, MOVE, WON } from "../Actions/types";
-import { changeTurn, getBoard, reset } from "../Actions/gameData";
+import {
+    changeTurn,
+    clearGameData,
+    getBoard,
+    reset,
+} from "../Actions/gameData";
 import webSocketService from "../class/WebSocketService";
 import Spinner from "./Spinner/Spinner";
 import { setGlobalLoadingState } from "../Actions/loadingState";
+import { useNavigate } from "react-router-dom";
+import { clearUserMetadata } from "../Actions/userData";
 
 const Board = ({
     changeTurn,
@@ -22,8 +29,11 @@ const Board = ({
     },
     loading: { globalLoading },
     setGlobalLoadingState,
+    clearUserMetadata,
+    clearGameData,
 }) => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [grid, setGrid] = useState(
         Array(rows).fill(Array(cols).fill("/transparent.png"))
     );
@@ -61,7 +71,12 @@ const Board = ({
                 updateGrid(message.board);
                 changeTurn(message.turn);
                 reset(moveIdentifier);
-                setGlobalLoadingState(false)
+                setGlobalLoadingState(false);
+            } else if (message.type === "LEAVE") {
+                if (message.moveIdentifier !== moveIdentifier) {
+                    alert("Opponent Closed the Game. Please start again!");
+                }
+                window.location.reload();
             } else {
                 const updatedGrid = message.board;
                 changeTurn(message.turn);
@@ -83,6 +98,11 @@ const Board = ({
         stompClient.subscribe("/topic/" + gameKey + "/game", onMessageRecieved);
 
         return () => {
+            stompClient.send(
+                `/app/game.move/${gameKey}`,
+                {},
+                JSON.stringify({ moveIdentifier, type: "LEAVE" })
+            );
             stompClient.unsubscribe("/topic/" + gameKey + "/game");
         };
     }, [dispatch]);
@@ -106,6 +126,15 @@ const Board = ({
             {},
             JSON.stringify({ turn, type: "RESET" })
         );
+    };
+
+    const closeGame = () => {
+        stompClient.send(
+            `/app/game.move/${gameKey}`,
+            {},
+            JSON.stringify({ moveIdentifier, type: "LEAVE" })
+        );
+        window.location.reload();
     };
 
     return globalLoading ? (
@@ -139,7 +168,12 @@ const Board = ({
             {won && (
                 <div>
                     <p>YOU {player === moveIdentifier ? "WIN" : "LOSE!!"}</p>
-                    <input type="button" value="REMATCH" onClick={resetBoard} />
+                    <input
+                        type="button"
+                        value="REMATCH"
+                        onClick={resetBoard}
+                    />{" "}
+                    <input type="button" value="END GAME" onClick={closeGame} />
                 </div>
             )}
             <br />
@@ -174,4 +208,6 @@ export default connect(mapStateToProps, {
     getBoard,
     reset,
     setGlobalLoadingState,
+    clearUserMetadata,
+    clearGameData,
 })(Board);

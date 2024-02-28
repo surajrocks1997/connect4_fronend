@@ -1,7 +1,7 @@
 import { IS_LOADING } from "../Actions/types";
 
 const initState = {
-    globalLoading: true,
+    globalLoading: false,
 };
 
 const loading = (state = initState, action) => {
