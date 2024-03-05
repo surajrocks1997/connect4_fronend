@@ -42,9 +42,9 @@ const Board = ({
     const updateGrid = (updatedGrid) => {
         const newGrid = grid.map((row, rIndex) =>
             row.map((cell, cellIndex) => {
-                if (updatedGrid[rIndex][cellIndex] === 1) return "/redDot.png";
+                if (updatedGrid[rIndex][cellIndex] === 1) return "/red-v1.png";
                 else if (updatedGrid[rIndex][cellIndex] === 2)
-                    return "/greenDot.png";
+                    return "/blue-v1.png";
                 else return "/transparent.png";
             })
         );
