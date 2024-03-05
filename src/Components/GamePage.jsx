@@ -7,6 +7,7 @@ import {
 } from "../Actions/gameData";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Spinner from "./Spinner/Spinner";
 
 const GamePage = ({
     generateKey,
@@ -14,6 +15,7 @@ const GamePage = ({
     setGameKeyInState,
     userInfo: { username },
     gameData: { error },
+    loading: { globalLoading },
 }) => {
     const navigate = useNavigate();
 
@@ -37,7 +39,9 @@ const GamePage = ({
         }
     };
 
-    return (
+    return globalLoading ? (
+        <Spinner />
+    ) : (
         <div>
             <div className="title">Welcome {username}</div>
 
@@ -88,11 +92,13 @@ GamePage.propTypes = {
     generateKey: PropTypes.func.isRequired,
     setGameKeyInState: PropTypes.func.isRequired,
     joinRoomValidation: PropTypes.func.isRequired,
+    globalLoading: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
     userInfo: state.userInfo,
     gameData: state.gameData,
+    loading: state.loading,
 });
 
 export default connect(mapStateToProps, {

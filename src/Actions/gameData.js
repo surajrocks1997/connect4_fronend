@@ -10,6 +10,9 @@ import {
     MOVE_IDENTIFIER,
     INIT_BOARD,
     CHANGE_TURN,
+    IS_LOADING,
+    RESET_WON,
+    CLEAR_GAME_DATA,
 } from "./types";
 
 export const generateKey = () => async (dispatch) => {
@@ -80,12 +83,40 @@ export const disconnect = () => (dispatch) => {
     });
 };
 
-export const getBoard = (rows, cols) => async (dispatch) => {
-    console.log("INSIDE INIT BOARD");
-    const grid = Array(rows).fill(Array(cols).fill(0));
+export const getBoard = (roomKey) => async (dispatch) => {
     dispatch({
-        type: INIT_BOARD,
-        payload: grid,
+        type: IS_LOADING,
+        payload: true,
+    });
+    console.log("INSIDE INIT BOARD");
+    try {
+        const grid = await axios.get(
+            `http://localhost:8080/boardState?roomKey=${roomKey}`
+        );
+
+        dispatch({
+            type: INIT_BOARD,
+            payload: grid.data,
+        });
+        dispatch({
+            type: IS_LOADING,
+            payload: false,
+        });
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+export const reset = (moveIdentifier) => async (dispatch) => {
+    console.log("RESET BOARD");
+
+    // dispatch({
+    //     type: MOVE_IDENTIFIER,
+    //     payload: moveIdentifier === 1 ? 2 : 1,
+    // });
+    dispatch({
+        type: RESET_WON,
+        payload: false,
     });
 };
 
@@ -93,5 +124,12 @@ export const changeTurn = (changeTurn) => (dispatch) => {
     dispatch({
         type: CHANGE_TURN,
         payload: changeTurn,
+    });
+};
+
+export const clearGameData = () => (dispatch) => {
+    dispatch({
+        type: CLEAR_GAME_DATA,
+        payload: null,
     });
 };

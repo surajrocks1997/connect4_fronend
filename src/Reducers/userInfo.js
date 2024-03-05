@@ -1,4 +1,9 @@
-import { USER_INFO, IS_ADMIN, MOVE_IDENTIFIER } from "../Actions/types";
+import {
+    USER_INFO,
+    IS_ADMIN,
+    MOVE_IDENTIFIER,
+    CLEAR_USER_METADATA,
+} from "../Actions/types";
 
 const initState = {
     username: null,
@@ -23,6 +28,12 @@ const userInfo = (state = initState, action) => {
             return {
                 ...state,
                 moveIdentifier: payload,
+            };
+        case CLEAR_USER_METADATA:
+            return {
+                ...state,
+                isAdmin: false,
+                moveIdentifier: 0,
             };
 
         default:
